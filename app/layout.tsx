@@ -1,6 +1,21 @@
 import type { Metadata } from "next";
+import { Fraunces, JetBrains_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import "./globals.css";
+
+const display = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "700", "900"],
+  variable: "--font-fraunces",
+  display: "swap"
+});
+
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-jetbrains-mono",
+  display: "swap"
+});
 
 export const metadata: Metadata = {
   title: "CallCatch — AI catches the calls you miss",
@@ -16,15 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en-GB">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;500&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-      <body>{children}</body>
+      <body className={`${display.variable} ${mono.variable}`}>{children}</body>
     </html>
   );
 }

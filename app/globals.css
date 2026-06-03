@@ -7,8 +7,8 @@
   --accent: #d94f1e;
   --accent-soft: #fdecdb;
   --rule: #1a1a1a;
-  --display: "Fraunces", Georgia, serif;
-  --mono: "JetBrains Mono", ui-monospace, monospace;
+  --display: var(--font-fraunces), Georgia, serif;
+  --mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
 * {
@@ -20,6 +20,8 @@ html {
 }
 
 body {
+  --display: var(--font-fraunces), Georgia, serif;
+  --mono: var(--font-jetbrains-mono), ui-monospace, monospace;
   margin: 0;
   background: var(--bg);
   color: var(--ink);
