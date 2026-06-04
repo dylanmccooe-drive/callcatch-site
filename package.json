@@ -4,7 +4,7 @@
   "private": true,
   "description": "CallCatch landing page",
   "scripts": {
-    "build": "mkdir -p dist && cp index.html dist/index.html",
+    "build": "mkdir -p dist && cp *.html dist/",
     "dev": "npx serve .",
     "start": "npx serve dist",
     "lint": "echo \"No lint configured for static site\"",

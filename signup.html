@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Start your CallCatch trial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f1ea;--bg-alt:#ebe5d8;--ink:#1a1a1a;--ink-soft:#4a4a4a;--accent:#d94f1e;--accent-soft:#fdecdb;--display:'Fraunces',Georgia,serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--display);font-weight:500}.wrap{max-width:1100px;margin:0 auto;padding:0 28px}nav{padding:26px 0;border-bottom:1px solid var(--ink);display:flex;justify-content:space-between;align-items:center}.logo{font-weight:900;font-size:22px;text-decoration:none;color:var(--ink)}.logo span{color:var(--accent)}.nav-link{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);text-decoration:none}.grid{display:grid;grid-template-columns:1fr 460px;gap:64px;align-items:start;padding:70px 0 100px}.eyebrow{font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);margin-bottom:22px}h1{font-size:clamp(44px,7vw,78px);line-height:.96;letter-spacing:-.035em;margin:0 0 24px;font-weight:900}em{color:var(--accent);font-style:italic;font-weight:500}p{font-size:18px;line-height:1.55;color:var(--ink-soft)}.card{background:#fff;border:2px solid var(--ink);padding:36px;box-shadow:8px 8px 0 var(--ink)}label{display:block;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-soft);margin:0 0 8px}input,select{width:100%;padding:13px 14px;border:1.5px solid var(--ink);margin-bottom:16px;font-size:16px;background:#fff}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.btn{width:100%;padding:18px;border:1.5px solid var(--accent);background:var(--accent);color:#fff;font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.12em;cursor:pointer}.pill{display:inline-block;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.14em;padding:7px 13px;border-radius:99px;margin-bottom:20px}.fine{font-family:var(--mono);font-size:11px;color:var(--ink-soft);text-align:center}.list{list-style:none;margin:28px 0 0;padding:0}.list li{padding:11px 0;border-bottom:1px dashed rgba(0,0,0,.18);color:var(--ink-soft)}.list li:before{content:'✓';color:var(--accent);font-weight:900;margin-right:10px}@media(max-width:850px){.grid{grid-template-columns:1fr;gap:36px}.row{grid-template-columns:1fr}.card{padding:24px;box-shadow:4px 4px 0 var(--ink)}nav{align-items:flex-start;gap:12px;flex-direction:column}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="logo" href="/">Call<span>Catch</span>.</a>
+    <a class="nav-link" href="/login.html">Login preview</a>
+  </nav>
+  <main class="grid">
+    <section>
+      <div class="eyebrow">No-cost MVP signup</div>
+      <h1>Start your <em>21-day trial</em>.</h1>
+      <p>This is the live no-backend version for now. It captures the details and opens WhatsApp so setup can be handled manually today.</p>
+      <ul class="list">
+        <li>21 days free</li>
+        <li>£45/month after trial</li>
+        <li>No Supabase or Stripe cost needed yet</li>
+        <li>Real payment/login can be connected later</li>
+      </ul>
+    </section>
+    <section class="card">
+      <div class="pill">Trial request</div>
+      <form onsubmit="return sendSignup(event)">
+        <div class="row">
+          <div><label for="firstName">First name</label><input id="firstName" required></div>
+          <div><label for="lastName">Last name</label><input id="lastName" required></div>
+        </div>
+        <label for="business">Business name</label><input id="business" required>
+        <label for="mobile">Mobile</label><input id="mobile" required>
+        <label for="trade">Trade</label>
+        <select id="trade" required>
+          <option value="">Select...</option><option>Plumber / Gas</option><option>Electrician</option><option>Builder</option><option>Roofer</option><option>Other trade</option>
+        </select>
+        <button class="btn" type="submit">Send trial request</button>
+        <p class="fine">This opens WhatsApp with your details. No card needed today.</p>
+      </form>
+    </section>
+  </main>
+</div>
+<script>
+function sendSignup(e){
+  e.preventDefault();
+  var msg="Hey, I'd like to start a CallCatch 21-day trial.%0A%0A"+
+    "Name: "+encodeURIComponent(document.getElementById('firstName').value+" "+document.getElementById('lastName').value)+"%0A"+
+    "Business: "+encodeURIComponent(document.getElementById('business').value)+"%0A"+
+    "Mobile: "+encodeURIComponent(document.getElementById('mobile').value)+"%0A"+
+    "Trade: "+encodeURIComponent(document.getElementById('trade').value);
+  window.location.href="https://wa.me/447711481659?text="+msg;
+  return false;
+}
+</script>
+</body>
+</html>
