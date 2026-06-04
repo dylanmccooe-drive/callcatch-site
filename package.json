@@ -1,45 +1,21 @@
 {
-  "name": "workspace",
+  "name": "callcatch-site",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "description": "CallCatch landing page",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint .",
-    "typecheck": "tsc --noEmit"
+    "build": "mkdir -p dist && cp index.html dist/index.html",
+    "dev": "npx serve .",
+    "start": "npx serve dist",
+    "lint": "echo \"No lint configured for static site\"",
+    "typecheck": "echo \"No TypeScript build for static site\""
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dylanmccooe-drive/callcatch-site.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/dylanmccooe-drive/callcatch-site/issues"
-  },
-  "homepage": "https://github.com/dylanmccooe-drive/callcatch-site#readme",
-  "dependencies": {
-    "@supabase/ssr": "^0.10.3",
-    "@supabase/supabase-js": "^2.107.0",
-    "next": "^16.2.7",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "stripe": "^22.2.0"
-  },
+  "license": "UNLICENSED",
   "devDependencies": {
-    "@types/node": "^25.9.1",
-    "@types/react": "^19.2.16",
-    "@types/react-dom": "^19.2.3",
-    "eslint": "^9.39.4",
-    "eslint-config-next": "^16.2.7",
-    "typescript": "^6.0.3"
-  },
-  "type": "module",
-  "overrides": {
-    "postcss": "8.5.15"
+    "wrangler": "^4.56.0"
   }
 }
