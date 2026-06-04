@@ -4,1041 +4,541 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>CallCatch — AI catches the calls you miss</title>
-<meta name="description" content="When you can't answer, CallCatch texts the caller back, captures the lead, and sends it straight to your phone. Built for Northern Irish trades." />
+<meta name="description" content="An AI tool that texts your missed callers back, pulls their name, postcode, and what they need straight to your phone. Built for Northern Irish trades." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900&family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --bg: #f5f2eb;
-  --bg-warm: #efeadf;
-  --bg-card: #ffffff;
-  --bg-dark: #0a0a0b;
-  --ink: #0a0a0b;
-  --ink-soft: #4a4a52;
-  --ink-muted: #8a8a92;
-  --accent: #d94f1e;
-  --accent-soft: #fdebd9;
-  --rule-soft: rgba(10,10,11,0.08);
-  --rule-faint: rgba(10,10,11,0.04);
-  --display: 'Fraunces','Times New Roman',serif;
-  --body: 'Inter Tight',-apple-system,BlinkMacSystemFont,sans-serif;
-  --mono: 'JetBrains Mono',ui-monospace,monospace;
-  --container: 1240px;
-  --gutter: clamp(20px,4vw,48px);
-  --ease: cubic-bezier(0.22,0.61,0.36,1);
-  --ease-out: cubic-bezier(0.16,1,0.3,1);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:hidden}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden;letter-spacing:-0.005em}
-body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(circle,rgba(10,10,11,.025) 1px,transparent 1px);background-size:32px 32px;opacity:.5}
-.wrap{max-width:var(--container);margin:0 auto;padding:0 var(--gutter);position:relative;z-index:2}
-::selection{background:var(--accent);color:#fff}
+  :root {
+    --bg: #f4f1ea;
+    --bg-alt: #ebe5d8;
+    --ink: #1a1a1a;
+    --ink-soft: #4a4a4a;
+    --accent: #d94f1e;
+    --rule: #1a1a1a;
+    --display: 'Fraunces', Georgia, serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
 
-/* ── ANNOUNCE BAR ── */
-.announce{background:var(--ink);color:var(--bg);padding:11px var(--gutter);display:flex;align-items:center;justify-content:center;gap:16px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;position:sticky;top:0;z-index:200}
-.announce-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse-dot 2s ease-in-out infinite;flex-shrink:0}
-@keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 rgba(217,79,30,.5)}50%{box-shadow:0 0 0 7px rgba(217,79,30,0)}}
-.announce strong{color:var(--accent)}
-.announce a{color:inherit;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
-.announce a:hover{color:var(--accent)}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
 
-/* ── NAV ── */
-nav{padding:22px 0;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--rule-soft)}
-.logo{font-family:var(--display);font-weight:900;font-size:22px;letter-spacing:-.04em;color:var(--ink);display:flex;align-items:center;gap:2px}
-.logo span{color:var(--accent)}
-.logo::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);margin-left:8px;animation:pulse-dot 2.4s var(--ease-out) infinite}
-.contact-dropdown{position:relative}
-.contact-btn{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;padding:11px 22px;background:var(--ink);color:var(--bg);border:1px solid var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:500;transition:all .18s var(--ease);border-radius:6px}
-.contact-btn:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-1px)}
-.contact-btn::after{content:'';width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid currentColor;margin-left:4px;transition:transform .18s var(--ease)}
-.contact-dropdown.open .contact-btn::after{transform:rotate(180deg)}
-.contact-menu{position:absolute;top:calc(100% + 10px);right:0;background:var(--bg-card);border:1px solid var(--rule-soft);min-width:200px;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .2s var(--ease);z-index:100;box-shadow:0 12px 32px rgba(10,10,11,.1);border-radius:10px;overflow:hidden}
-.contact-dropdown.open .contact-menu{opacity:1;visibility:visible;transform:translateY(0)}
-.contact-menu a{display:flex;align-items:center;gap:12px;padding:13px 18px;font-size:14px;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule-faint);transition:all .15s var(--ease);font-weight:500}
-.contact-menu a:last-child{border-bottom:none}
-.contact-menu a:hover{background:var(--bg-warm);color:var(--accent);padding-left:22px}
-.contact-menu svg{width:18px;height:18px;flex-shrink:0}
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--display);
+    font-weight: 500;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
 
-/* ── SCROLL ANIMATION ── */
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s var(--ease-out),transform .6s var(--ease-out)}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.reveal-delay-1{transition-delay:.1s}
-.reveal-delay-2{transition-delay:.2s}
-.reveal-delay-3{transition-delay:.3s}
+  /* subtle paper texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(0,0,0,0.015) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(0,0,0,0.02) 0%, transparent 50%);
+    z-index: 1;
+  }
 
-/* ── HERO ── */
-.hero{padding:72px 0 96px;position:relative;overflow:hidden}
-.hero-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:64px;align-items:center}
-.eyebrow{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);margin-bottom:24px;display:flex;align-items:center;gap:14px;font-weight:500}
-.eyebrow::before{content:'';width:36px;height:1.5px;background:var(--accent)}
-h1{font-family:var(--display);font-weight:900;font-size:clamp(48px,7.5vw,96px);line-height:.94;letter-spacing:-.045em;margin-bottom:10px;font-variation-settings:"opsz" 144}
-h1 em{font-style:italic;font-weight:400;color:var(--accent);font-variation-settings:"opsz" 144}
-.hero-callout{display:inline-flex;align-items:center;gap:10px;background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:12px;font-weight:500;padding:10px 18px;border-radius:8px;margin-bottom:28px;letter-spacing:.04em}
-.hero-callout strong{color:var(--accent)}
-.hero-sub{font-size:clamp(17px,1.4vw,20px);line-height:1.55;color:var(--ink-soft);max-width:520px;margin-bottom:36px;font-weight:400}
-.cta-row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
-.btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--body);font-size:15px;font-weight:500;padding:16px 28px;text-decoration:none;border:1px solid var(--ink);transition:all .2s var(--ease);cursor:pointer;border-radius:8px;letter-spacing:-.005em;position:relative;overflow:hidden}
-.btn-primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.btn-primary:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-1px);box-shadow:0 10px 24px -8px rgba(217,79,30,.5)}
-.btn-secondary{background:transparent;color:var(--ink)}
-.btn-secondary:hover{background:var(--ink);color:var(--bg);transform:translateY(-1px)}
-.btn .arrow{transition:transform .2s var(--ease)}
-.btn:hover .arrow{transform:translateX(3px)}
-.hero-trust{margin-top:28px;display:flex;flex-wrap:wrap;gap:10px}
-.trust-pill{font-family:var(--mono);font-size:11px;letter-spacing:.05em;padding:7px 14px;background:var(--bg-card);border:1px solid var(--rule-soft);color:var(--ink-soft);border-radius:999px;display:inline-flex;align-items:center;gap:6px;font-weight:500}
-.trust-pill::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--accent)}
+  .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+    z-index: 2;
+  }
 
-/* Phone mockup */
-.phone-frame{position:relative;width:100%;max-width:320px;margin:0 auto;aspect-ratio:9/19;border-radius:48px;background:linear-gradient(135deg,#1a1a1c 0%,#0a0a0b 100%);padding:10px;box-shadow:0 0 0 2px #0a0a0b,0 50px 100px -30px rgba(10,10,11,.4),0 30px 60px -20px rgba(217,79,30,.18);transform:rotate(2deg) rotateY(-2deg);transition:transform .6s var(--ease)}
-.phone-frame:hover{transform:rotate(0deg) rotateY(0deg) translateY(-8px)}
-.phone-screen{width:100%;height:100%;border-radius:38px;overflow:hidden;position:relative;background:#fff}
-.phone-notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:90px;height:26px;background:#0a0a0b;border-radius:14px;z-index:2}
-.sms-thread{padding:48px 14px 20px;height:100%;overflow:hidden;display:flex;flex-direction:column;gap:8px;font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#fafafa}
-.sms-header{text-align:center;font-size:10px;color:#8a8a92;padding-bottom:8px;border-bottom:1px solid #ececec;margin-bottom:4px;font-weight:500}
-.sms-bubble{max-width:78%;padding:9px 12px;border-radius:18px;font-size:12.5px;line-height:1.35;word-wrap:break-word;animation:fade-up .4s var(--ease) backwards}
-@keyframes fade-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.sms-bubble:nth-child(2){animation-delay:.4s}
-.sms-bubble:nth-child(3){animation-delay:.9s}
-.sms-time{animation-delay:1.2s}
-.sms-bubble:nth-child(5){animation-delay:1.7s}
-.sms-bubble.in{background:#e9e9eb;color:#000;border-bottom-left-radius:4px;align-self:flex-start}
-.sms-bubble.out{background:#34c759;color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
-.sms-bubble.summary{background:#fff;color:#000;align-self:stretch;max-width:100%;border-radius:12px;font-weight:500;border:1px solid #ececec;box-shadow:0 1px 2px rgba(0,0,0,.04);animation-delay:1.7s}
-.sms-bubble.summary strong{display:block;margin-bottom:4px;font-size:11px;color:#d94f1e;font-weight:600}
-.sms-time{font-size:9px;color:#8a8a92;text-align:center;margin:4px 0;animation:fade-up .4s var(--ease) backwards}
-.phone-caption{text-align:center;margin-top:24px;font-family:var(--mono);font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.18em;font-weight:500}
-.phone-caption span{color:var(--accent);margin:0 6px}
+  /* NAV */
+  nav {
+    padding: 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .logo {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--accent); }
+  .nav-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+  }
 
-/* ── STATS STRIP ── */
-.stats-strip{padding:48px 0;border-top:1px solid var(--rule-soft);border-bottom:1px solid var(--rule-soft)}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0}
-.stat{padding:0 32px;border-right:1px solid var(--rule-soft);text-align:center}
-.stat:last-child{border-right:none}
-.stat-num{font-family:var(--display);font-weight:900;font-size:clamp(40px,5vw,64px);line-height:1;letter-spacing:-.04em;color:var(--ink);font-variation-settings:"opsz" 144;margin-bottom:6px}
-.stat-num em{font-style:italic;color:var(--accent);font-weight:400}
-.stat-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--ink-muted);font-weight:500}
+  /* HERO */
+  .hero {
+    padding: 80px 0 100px;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .eyebrow::before {
+    content: '';
+    width: 32px;
+    height: 1px;
+    background: var(--accent);
+  }
+  h1 {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    margin-bottom: 32px;
+  }
+  h1 em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--accent);
+  }
+  .hero-sub {
+    font-size: 20px;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 480px;
+    margin-bottom: 40px;
+  }
+  .cta-row {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 18px 32px;
+    text-decoration: none;
+    border: 1.5px solid var(--ink);
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .btn-primary:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+  }
+  .btn-secondary:hover {
+    background: var(--ink);
+    color: var(--bg);
+  }
 
-/* ── PROBLEM SECTION ── */
-.problem{padding:120px 0;border-bottom:1px solid var(--rule-soft)}
-.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:start}
-.problem-left .section-label{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);font-weight:500;margin-bottom:24px;display:flex;align-items:center;gap:12px}
-.problem-left .section-label::before{content:'';width:32px;height:1.5px;background:var(--accent)}
-.problem-left h2{font-family:var(--display);font-weight:900;font-size:clamp(38px,5.5vw,72px);letter-spacing:-.04em;line-height:.96;margin-bottom:28px;font-variation-settings:"opsz" 144}
-.problem-left h2 em{font-style:italic;font-weight:400;color:var(--accent)}
-.problem-left p{font-size:18px;line-height:1.65;color:var(--ink-soft);margin-bottom:16px}
-.problem-scenarios{display:flex;flex-direction:column;gap:16px;margin-top:8px}
-.scenario{background:var(--bg-card);border:1px solid var(--rule-soft);border-radius:12px;padding:20px 24px;position:relative;overflow:hidden;transition:all .25s var(--ease)}
-.scenario:hover{border-color:var(--accent);transform:translateX(4px)}
-.scenario::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
-.scenario-trade{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--accent);font-weight:500;margin-bottom:6px}
-.scenario-text{font-size:15px;line-height:1.5;color:var(--ink);font-weight:500}
-.scenario-cost{margin-top:8px;font-family:var(--mono);font-size:12px;color:var(--ink-muted);letter-spacing:.05em}
-.scenario-cost strong{color:var(--ink);font-weight:600}
+  /* SMS preview card */
+  .phone-mock {
+    background: #fff;
+    border: 1.5px solid var(--ink);
+    padding: 24px;
+    box-shadow: 8px 8px 0 var(--ink);
+    transform: rotate(1.5deg);
+    transition: transform 0.3s ease;
+  }
+  .phone-mock:hover { transform: rotate(0deg); }
+  .phone-header {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-soft);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px dashed var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+  }
+  .sms-bubble {
+    background: var(--bg-alt);
+    padding: 14px 16px;
+    border-radius: 18px 18px 18px 4px;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+  .sms-bubble.out {
+    background: var(--ink);
+    color: var(--bg);
+    border-radius: 18px 18px 4px 18px;
+    margin-left: 30px;
+  }
+  .sms-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin: 16px 0 8px;
+    letter-spacing: 0.1em;
+  }
 
-/* ── HOW IT WORKS ── */
-.how{padding:120px 0;border-bottom:1px solid var(--rule-soft)}
-.section-head{display:grid;grid-template-columns:1fr auto;align-items:end;margin-bottom:72px;gap:24px}
-.section-head h2{font-family:var(--display);font-weight:900;font-size:clamp(40px,6vw,80px);letter-spacing:-.04em;line-height:.95;font-variation-settings:"opsz" 144}
-.section-head h2 em{font-style:italic;font-weight:400;color:var(--accent)}
-.section-tag{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--ink-muted);font-weight:500;text-align:right;padding-bottom:8px}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:48px}
-.step{position:relative;padding-top:28px;border-top:1.5px solid var(--ink)}
-.step::before{content:'';position:absolute;top:-5px;left:0;width:9px;height:9px;background:var(--accent);border-radius:50%}
-.step-num{font-family:var(--display);font-style:italic;font-weight:400;font-size:60px;color:var(--accent);line-height:1;margin-bottom:18px;font-variation-settings:"opsz" 144}
-.step h3{font-family:var(--display);font-weight:700;font-size:24px;margin-bottom:12px;letter-spacing:-.02em;line-height:1.15}
-.step p{color:var(--ink-soft);font-size:16px;line-height:1.55}
+  /* HOW IT WORKS */
+  .how {
+    padding: 100px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 64px;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .section-head h2 {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(36px, 5vw, 64px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 48px;
+  }
+  .step {
+    border-top: 2px solid var(--ink);
+    padding-top: 24px;
+    position: relative;
+  }
+  .step-num {
+    font-family: var(--display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 56px;
+    color: var(--accent);
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .step h3 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 22px;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .step p {
+    color: var(--ink-soft);
+    font-size: 16px;
+    line-height: 1.55;
+  }
 
-/* ── COMPARISON TABLE ── */
-.compare{padding:120px 0;border-bottom:1px solid var(--rule-soft)}
-.compare-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:16px;width:100%;max-width:100%}
-.compare-table{width:100%;border-collapse:collapse;min-width:680px}
-.compare-table th{padding:20px 24px;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.12em;font-weight:600;text-align:left;border-bottom:2px solid var(--ink)}
-.compare-table th:first-child{color:var(--ink-muted);font-size:11px}
-.compare-table th.col-cc{background:var(--ink);color:var(--bg);text-align:center;border-radius:12px 12px 0 0}
-.compare-table td{padding:18px 24px;font-size:15px;border-bottom:1px solid var(--rule-soft);vertical-align:middle}
-.compare-table td:first-child{font-weight:500;font-size:14px;color:var(--ink-soft)}
-.compare-table td:not(:first-child){text-align:center}
-.compare-table td.col-cc{background:rgba(10,10,11,.03);border-left:1px solid var(--rule-soft);border-right:1px solid var(--rule-soft)}
-.compare-table tr:last-child td.col-cc{border-radius:0 0 12px 12px;border-bottom:1px solid var(--rule-soft)}
-.compare-table .check{color:#34c759;font-size:20px;font-weight:700}
-.compare-table .cross{color:var(--ink-faint,#c4c4cb);font-size:18px}
-.compare-table .highlight{color:var(--accent);font-family:var(--mono);font-size:13px;font-weight:600}
-.compare-table .cost-good{color:var(--accent);font-family:var(--display);font-weight:700;font-size:20px}
-.compare-table .cost-bad{color:var(--ink-muted);font-family:var(--mono);font-size:12px;text-decoration:line-through}
-.compare-cta{margin-top:36px;text-align:center;font-family:var(--mono);font-size:12px;color:var(--ink-muted);letter-spacing:.08em;text-transform:uppercase}
+  /* OFFER */
+  .offer {
+    padding: 100px 0;
+    background: var(--ink);
+    color: var(--bg);
+    margin: 0 -100vw;
+    padding-left: 100vw;
+    padding-right: 100vw;
+  }
+  .offer-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .offer .eyebrow { color: var(--accent); }
+  .offer .eyebrow::before { background: var(--accent); }
+  .offer h2 {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(36px, 5vw, 64px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 24px;
+  }
+  .offer h2 em { font-style: italic; font-weight: 500; color: var(--accent); }
+  .offer p {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    color: rgba(244, 241, 234, 0.8);
+  }
+  .offer-list {
+    list-style: none;
+  }
+  .offer-list li {
+    font-family: var(--mono);
+    font-size: 14px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(244, 241, 234, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .offer-list li::before {
+    content: '→';
+    color: var(--accent);
+    font-family: var(--display);
+    font-size: 20px;
+  }
+  .offer .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    margin-top: 24px;
+  }
+  .offer .btn-primary:hover {
+    background: var(--bg);
+    color: var(--ink);
+    border-color: var(--bg);
+  }
 
-/* ── DEMO SECTION ── */
-.demo{padding:120px 0;background:var(--bg-dark);color:var(--bg);margin:0 -100vw;padding-left:100vw;padding-right:100vw;position:relative;overflow:hidden}
-.demo::before{content:'';position:absolute;top:-50%;left:-10%;width:60%;height:200%;background:radial-gradient(circle,rgba(217,79,30,.18) 0%,transparent 60%);pointer-events:none}
-.demo-inner{max-width:1200px;margin:0 auto;padding:0 var(--gutter);position:relative;z-index:2}
-.demo-head{text-align:center;margin-bottom:56px}
-.demo-eyebrow{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--accent);background:rgba(217,79,30,.1);border:1px solid rgba(217,79,30,.3);padding:8px 16px;border-radius:999px;margin-bottom:24px;font-weight:500}
-.demo-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent)}
-.demo h2{font-family:var(--display);font-weight:900;font-size:clamp(36px,5.5vw,72px);letter-spacing:-.04em;line-height:.98;margin-bottom:20px;color:var(--bg);font-variation-settings:"opsz" 144}
-.demo h2 em{font-style:italic;font-weight:400;color:var(--accent)}
-.demo-sub{color:rgba(245,242,235,.6);font-size:18px;max-width:580px;margin:0 auto;line-height:1.5}
-.demo-grid{display:grid;grid-template-columns:340px 1fr;gap:32px;align-items:stretch}
-.demo-phone{background:rgba(255,255,255,.03);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;min-height:580px;display:flex;flex-direction:column}
-.demo-phone-header{display:flex;align-items:center;gap:10px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.06);margin-bottom:18px}
-.demo-phone-status{width:8px;height:8px;border-radius:50%;background:#34c759;box-shadow:0 0 10px #34c759;animation:blink 1.5s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
-.demo-phone-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:rgba(245,242,235,.7);font-weight:500}
-.demo-phone-time{margin-left:auto;font-family:var(--mono);font-size:10px;color:rgba(245,242,235,.4);letter-spacing:.1em}
-.demo-incoming{background:rgba(217,79,30,.08);border:1px solid rgba(217,79,30,.3);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:none}
-.demo-incoming-from{font-family:var(--mono);font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px;font-weight:500}
-.demo-incoming-msg{font-size:13px;line-height:1.45;color:var(--bg)}
-.demo-msgs{flex:1;display:flex;flex-direction:column;gap:10px;overflow:hidden}
-.demo-bubble{padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.45;max-width:88%;opacity:0;transform:translateY(8px);transition:opacity .45s var(--ease),transform .45s var(--ease)}
-.demo-bubble.show{opacity:1;transform:translateY(0)}
-.demo-bubble.in{background:rgba(245,242,235,.08);color:var(--bg);border-bottom-left-radius:4px;align-self:flex-start;border:1px solid rgba(245,242,235,.05)}
-.demo-bubble.out{background:#34c759;color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
-.demo-bubble.summary{background:rgba(217,79,30,.12);border:1px solid rgba(217,79,30,.4);color:var(--bg);align-self:stretch;max-width:100%;border-radius:10px;font-family:var(--mono);font-size:12px;line-height:1.65;padding:14px}
-.demo-bubble.summary strong{display:block;color:var(--accent);margin-bottom:8px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:600}
-.demo-engine{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:28px;min-height:580px;display:flex;flex-direction:column;gap:12px}
-.demo-engine-head{display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid rgba(245,242,235,.06)}
-.demo-engine-title{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--bg);font-weight:500}
-.demo-engine-live{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;background:rgba(52,199,89,.15);border:1px solid rgba(52,199,89,.5);color:#34c759;padding:3px 9px;border-radius:999px;font-weight:500}
-.demo-engine-tokens{margin-left:auto;font-family:var(--mono);font-size:10px;color:rgba(245,242,235,.4);letter-spacing:.08em}
-.demo-engine-tokens span{color:var(--accent)}
-.demo-stage{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:10px;padding:13px 15px;transition:all .4s var(--ease)}
-.demo-stage.active{background:rgba(217,79,30,.08);border-color:rgba(217,79,30,.4)}
-.demo-stage.done{background:rgba(52,199,89,.05);border-color:rgba(52,199,89,.25)}
-.demo-stage-head{display:flex;align-items:center;gap:10px;margin-bottom:5px}
-.demo-stage-dot{width:8px;height:8px;border-radius:50%;background:rgba(245,242,235,.15);transition:all .4s var(--ease);flex-shrink:0}
-.demo-stage.active .demo-stage-dot{background:var(--accent);box-shadow:0 0 10px var(--accent);animation:blink 1.2s ease-in-out infinite}
-.demo-stage.done .demo-stage-dot{background:#34c759}
-.demo-stage-name{font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:rgba(245,242,235,.65);font-weight:500}
-.demo-stage.active .demo-stage-name{color:var(--bg)}
-.demo-stage-status{margin-left:auto;font-family:var(--mono);font-size:9px;color:rgba(245,242,235,.3);letter-spacing:.15em;text-transform:uppercase}
-.demo-stage.active .demo-stage-status{color:var(--accent)}
-.demo-stage.done .demo-stage-status{color:#34c759}
-.demo-stage-detail{font-family:var(--mono);font-size:11px;color:rgba(245,242,235,.45);margin-left:18px;line-height:1.5;min-height:14px}
-.demo-stage-detail .extracted{color:var(--accent);background:rgba(217,79,30,.1);padding:2px 7px;border-radius:4px;margin-right:5px;display:inline-block;margin-top:3px;font-weight:500}
-.demo-stage.done .demo-stage-detail .extracted{color:#34c759;background:rgba(52,199,89,.1)}
-.demo-result{margin-top:auto;background:linear-gradient(135deg,rgba(217,79,30,.12),rgba(217,79,30,.05));border:1px solid var(--accent);border-radius:10px;padding:15px 18px;opacity:0;transform:translateY(8px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
-.demo-result.show{opacity:1;transform:translateY(0)}
-.demo-result-label{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);margin-bottom:4px;font-weight:500}
-.demo-result-text{font-family:var(--mono);font-size:13px;color:var(--bg);font-weight:500}
-.demo-controls{text-align:center;margin-top:44px}
-.demo-btn{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.18em;padding:15px 36px;background:var(--accent);color:#fff;border:1px solid var(--accent);cursor:pointer;transition:all .2s var(--ease);font-weight:500;border-radius:6px}
-.demo-btn:hover:not(:disabled){background:var(--bg);color:var(--ink);border-color:var(--bg);transform:translateY(-1px)}
-.demo-btn:disabled{opacity:.5;cursor:not-allowed}
-.demo-caption{margin-top:16px;font-family:var(--mono);font-size:10px;color:rgba(245,242,235,.35);letter-spacing:.15em;text-transform:uppercase}
+  /* PRICING */
+  .pricing {
+    padding: 100px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .price-card {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+    border: 2px solid var(--ink);
+    padding: 56px 40px;
+    background: #fff;
+    position: relative;
+  }
+  .price-card::before {
+    content: 'STANDARD';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    padding: 4px 16px;
+  }
+  .price-big {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: 72px;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 8px;
+  }
+  .price-big span { color: var(--accent); font-style: italic; font-weight: 500; }
+  .price-period {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 32px;
+  }
+  .price-setup {
+    font-family: var(--display);
+    font-size: 18px;
+    color: var(--ink-soft);
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .price-features {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 32px;
+  }
+  .price-features li {
+    padding: 12px 0;
+    font-size: 16px;
+    border-bottom: 1px dashed rgba(0,0,0,0.15);
+  }
+  .price-features li::before {
+    content: '✓ ';
+    color: var(--accent);
+    font-weight: 700;
+    margin-right: 8px;
+  }
 
-/* ── FEATURES ── */
-.features{padding:120px 0;border-bottom:1px solid var(--rule-soft)}
-.features-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
-.feature{background:var(--bg-card);border:1px solid var(--rule-soft);border-radius:16px;padding:28px 24px;transition:all .3s var(--ease);position:relative;overflow:hidden}
-.feature::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .4s var(--ease)}
-.feature:hover{transform:translateY(-4px);box-shadow:0 20px 40px -20px rgba(10,10,11,.12)}
-.feature:hover::before{transform:scaleX(1)}
-.feature-icon{width:44px;height:44px;margin-bottom:20px;background:var(--ink);color:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
-.feature h4{font-family:var(--display);font-weight:700;font-size:19px;margin-bottom:10px;letter-spacing:-.02em;line-height:1.2}
-.feature p{font-size:14px;color:var(--ink-soft);line-height:1.55}
+  /* FOOTER */
+  footer {
+    padding: 48px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  footer a { color: var(--ink); text-decoration: none; }
+  footer a:hover { color: var(--accent); }
 
-/* ── BUILT BY ── */
-.built-by{padding:120px 0;border-bottom:1px solid var(--rule-soft)}
-.built-by-inner{max-width:760px}
-.builder-header{display:flex;align-items:center;gap:20px;margin-bottom:36px}
-.builder-photo{width:72px;height:72px;flex-shrink:0;border-radius:50%;background:var(--bg-warm);border:2px solid var(--ink);overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center;color:var(--ink-muted)}
-.builder-photo svg{width:40px;height:40px;opacity:.4}
-.builder-name{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.02em}
-.builder-role{font-family:var(--mono);font-size:12px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.12em;margin-top:5px;font-weight:500}
-.builder-role a{color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent)}
-.built-by h2{font-family:var(--display);font-weight:900;font-size:clamp(38px,5.5vw,70px);letter-spacing:-.04em;line-height:1;margin-bottom:28px;font-variation-settings:"opsz" 144}
-.built-by h2 em{font-style:italic;font-weight:400;color:var(--accent)}
-.built-by p{font-size:17px;line-height:1.65;color:var(--ink);margin-bottom:16px}
-.built-by p.soft{color:var(--ink-soft)}
-.builder-credits{margin-top:28px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding-top:24px;border-top:1px solid var(--rule-soft)}
-.builder-credit{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
-.builder-credit-label{color:var(--ink-muted);display:block;margin-bottom:5px;font-weight:500}
-.builder-credit-value{color:var(--ink);font-weight:600}
-.builder-credit-value a{color:inherit;border-bottom:1px solid currentColor;text-decoration:none}
-
-/* ── OFFER ── */
-.offer{padding:120px 0;background:var(--bg-dark);color:var(--bg);margin:0 -100vw;padding-left:100vw;padding-right:100vw;position:relative;overflow:hidden}
-.offer::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 20% 50%,rgba(217,79,30,.15) 0%,transparent 50%),radial-gradient(circle at 80% 30%,rgba(217,79,30,.06) 0%,transparent 40%);pointer-events:none}
-.offer-inner{max-width:1200px;margin:0 auto;padding:0 var(--gutter);display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;position:relative;z-index:2}
-.offer .eyebrow{color:var(--accent)}
-.offer h2{font-family:var(--display);font-weight:900;font-size:clamp(38px,5vw,72px);letter-spacing:-.04em;line-height:.98;margin-bottom:24px;font-variation-settings:"opsz" 144}
-.offer h2 em{font-style:italic;font-weight:400;color:var(--accent)}
-.offer p{font-size:17px;line-height:1.65;margin-bottom:16px;color:rgba(245,242,235,.75)}
-.offer-list{list-style:none}
-.offer-list li{font-family:var(--mono);font-size:13px;padding:16px 0;border-bottom:1px solid rgba(245,242,235,.1);display:flex;align-items:center;gap:16px;color:rgba(245,242,235,.85);font-weight:500;letter-spacing:.02em}
-.offer-list li::before{content:'✓';color:var(--accent);font-weight:700;font-size:16px;flex-shrink:0}
-.offer .btn-primary{margin-top:28px;background:var(--accent);border-color:var(--accent)}
-.offer .btn-primary:hover{background:var(--bg);color:var(--ink);border-color:var(--bg)}
-
-/* ── FAQ ── */
-.faq{padding:120px 0;border-bottom:1px solid var(--rule-soft)}
-.faq-list{max-width:800px}
-details{border-top:1px solid var(--rule-soft);padding:24px 0;transition:padding .2s var(--ease)}
-details:last-of-type{border-bottom:1px solid var(--rule-soft)}
-details:hover{padding-left:6px}
-details summary{font-family:var(--display);font-weight:700;font-size:21px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;letter-spacing:-.02em;line-height:1.3}
-details summary::-webkit-details-marker{display:none}
-details summary::after{content:'+';font-family:var(--display);font-size:30px;font-weight:400;color:var(--accent);transition:transform .25s var(--ease);line-height:1;flex-shrink:0}
-details[open] summary::after{transform:rotate(45deg)}
-details p{margin-top:16px;font-size:16px;line-height:1.65;color:var(--ink-soft)}
-
-/* ── SIGNUP FORM ── */
-.signup{padding:120px 0;background:var(--bg-warm);margin:0 -100vw;padding-left:100vw;padding-right:100vw;border-top:1px solid var(--rule-soft);border-bottom:1px solid var(--rule-soft)}
-.signup-inner{max-width:1200px;margin:0 auto;padding:0 var(--gutter);display:grid;grid-template-columns:1fr 1.05fr;gap:72px;align-items:center}
-.signup-left .pill{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);border:1px solid var(--accent);color:var(--accent);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;padding:7px 16px;border-radius:999px;margin-bottom:24px;font-weight:500}
-.signup-left .pill::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:blink 1.5s ease-in-out infinite}
-.signup-left h2{font-family:var(--display);font-weight:900;font-size:clamp(38px,5vw,68px);letter-spacing:-.04em;line-height:.98;margin-bottom:24px;font-variation-settings:"opsz" 144}
-.signup-left h2 em{font-style:italic;font-weight:400;color:var(--accent)}
-.signup-left p{font-size:17px;line-height:1.65;color:var(--ink-soft);margin-bottom:14px}
-.signup-bullets{list-style:none;margin-top:24px}
-.signup-bullets li{font-family:var(--mono);font-size:13px;padding:11px 0;color:var(--ink);display:flex;align-items:center;gap:12px;font-weight:500;border-bottom:1px solid var(--rule-faint)}
-.signup-bullets li:last-child{border-bottom:none}
-.signup-bullets li::before{content:'✓';color:var(--accent);font-weight:700;font-size:15px}
-.signup-card{background:var(--bg-card);border:1px solid var(--rule-soft);border-radius:20px;padding:44px;box-shadow:0 1px 2px rgba(10,10,11,.04),0 24px 48px -16px rgba(10,10,11,.08)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
-.form-field{margin-bottom:18px}
-.form-field label{display:block;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-bottom:9px;font-weight:500}
-.form-field input,.form-field select{width:100%;padding:13px 15px;border:1px solid var(--rule-soft);background:var(--bg);font-family:var(--body);font-size:15px;font-weight:500;color:var(--ink);border-radius:8px;transition:all .18s var(--ease);appearance:none;-webkit-appearance:none}
-.form-field input:focus,.form-field select:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 4px rgba(217,79,30,.1)}
-.form-field input::placeholder{color:var(--ink-muted);font-weight:400}
-.form-field select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%230a0a0b' d='M6 8L0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 15px center;padding-right:38px}
-.plan-group{margin:24px 0}
-.plan-group-label{display:block;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--ink-soft);margin-bottom:11px;font-weight:500}
-.plan-options{display:grid;gap:10px}
-.plan-option{border:1px solid var(--rule-soft);padding:16px 20px;cursor:pointer;transition:all .18s var(--ease);position:relative;background:var(--bg);border-radius:10px}
-.plan-option:hover{border-color:var(--ink)}
-.plan-option input[type="radio"]{position:absolute;opacity:0;pointer-events:none}
-.plan-option-title{font-family:var(--display);font-weight:700;font-size:16px;margin-bottom:3px;letter-spacing:-.01em}
-.plan-option-price{font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
-.plan-option.selected{background:var(--accent-soft);border-color:var(--accent);border-width:1.5px}
-.plan-option.selected .plan-option-title{color:var(--accent)}
-.plan-tag{position:absolute;top:-9px;right:14px;background:var(--accent);color:#fff;font-family:var(--mono);font-size:9px;letter-spacing:.15em;padding:3px 9px;text-transform:uppercase;border-radius:4px;font-weight:500}
-.form-submit{width:100%;padding:17px;background:var(--ink);color:var(--bg);border:1px solid var(--ink);font-family:var(--body);font-size:15px;font-weight:500;cursor:pointer;transition:all .2s var(--ease);margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:8px;letter-spacing:-.005em}
-.form-submit:hover{background:var(--accent);border-color:var(--accent);transform:translateY(-1px);box-shadow:0 10px 24px -8px rgba(217,79,30,.4)}
-.form-disclaimer{margin-top:14px;font-size:12px;color:var(--ink-muted);text-align:center;line-height:1.5}
-.form-disclaimer strong{color:var(--ink);font-weight:500}
-
-/* ── PRICING ── */
-.pricing{padding:120px 0;border-bottom:1px solid var(--rule-soft)}
-.price-card{max-width:600px;margin:0 auto;text-align:center;border:1px solid var(--rule-soft);padding:56px 44px;background:var(--bg-card);position:relative;border-radius:20px;box-shadow:0 1px 2px rgba(10,10,11,.04),0 24px 48px -16px rgba(10,10,11,.08)}
-.price-card::before{content:'EVERYTHING INCLUDED';position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-family:var(--mono);font-size:10px;letter-spacing:.18em;padding:5px 18px;border-radius:999px;font-weight:500;white-space:nowrap}
-.price-big{font-family:var(--display);font-weight:900;font-size:80px;line-height:1;letter-spacing:-.05em;margin-bottom:8px;font-variation-settings:"opsz" 144}
-.price-big span{color:var(--accent);font-style:italic;font-weight:400;font-size:.55em}
-.price-period{font-family:var(--mono);font-size:12px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.18em;margin-bottom:28px;font-weight:500}
-.price-setup{font-family:var(--display);font-size:17px;color:var(--ink-soft);margin-bottom:28px;padding-bottom:28px;border-bottom:1px solid var(--rule-soft)}
-.price-setup strong{color:var(--ink);display:block;margin-bottom:4px;font-weight:700}
-.price-setup em{font-style:italic;color:var(--accent);font-size:.9em}
-.price-features{list-style:none;text-align:left;margin-bottom:32px}
-.price-features li{padding:12px 0;font-size:15px;border-bottom:1px solid var(--rule-faint);color:var(--ink)}
-.price-features li:last-child{border-bottom:none}
-.price-features li::before{content:'✓';color:var(--accent);font-weight:700;margin-right:12px}
-
-/* ── FINAL CTA ── */
-.final-cta{padding:140px 0;text-align:center;border-top:1px solid var(--rule-soft);position:relative;overflow:hidden}
-.final-cta::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 100%,rgba(217,79,30,.07) 0%,transparent 60%);pointer-events:none}
-.final-cta h2{font-family:var(--display);font-weight:900;font-size:clamp(48px,7vw,100px);letter-spacing:-.045em;line-height:.94;margin-bottom:32px;font-variation-settings:"opsz" 144;position:relative}
-.final-cta h2 em{font-style:italic;font-weight:400;color:var(--accent)}
-.final-cta p{font-size:19px;color:var(--ink-soft);max-width:540px;margin:0 auto 44px;line-height:1.5}
-.final-cta .btn{position:relative}
-.whatsapp-icon{width:18px;height:18px;flex-shrink:0}
-
-/* ── FOOTER ── */
-footer{padding:48px 0;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11px;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.15em;flex-wrap:wrap;gap:14px;border-top:1px solid var(--rule-soft);font-weight:500}
-footer a{color:var(--ink);text-decoration:none;transition:color .15s var(--ease)}
-footer a:hover{color:var(--accent)}
-
-/* ── RESPONSIVE ── */
-@media(max-width:1024px){
-  .features-grid{grid-template-columns:repeat(2,1fr)}
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .stat{padding:24px 0;border-right:none;border-bottom:1px solid var(--rule-soft)}
-  .stat:nth-child(odd){border-right:1px solid var(--rule-soft);padding-right:24px}
-  .stat:nth-child(3),.stat:nth-child(4){border-bottom:none}
-  .demo-grid{grid-template-columns:1fr}
-  .offer-inner,.signup-inner{grid-template-columns:1fr;gap:48px}
-}
-@media(max-width:768px){
-  h1{font-size:clamp(40px,12vw,64px)}
-  .hero{padding:48px 0 64px}
-  .hero-grid{grid-template-columns:1fr;gap:48px}
-  .phone-frame{transform:none;max-width:280px}
-  .steps{grid-template-columns:1fr;gap:36px}
-  .features-grid{grid-template-columns:1fr}
-  .section-head{grid-template-columns:1fr}
-  .section-tag{text-align:left}
-  .builder-credits{grid-template-columns:1fr}
-  .how,.features,.built-by,.pricing,.faq,.compare{padding:72px 0}
-  .demo,.signup,.offer{padding:72px 0}
-  .final-cta{padding:88px 0}
-  .problem{padding:72px 0}
-  .problem-grid{grid-template-columns:1fr;gap:48px}
-  .signup-card{padding:28px 20px}
-  nav{padding:16px 0}
-  footer{flex-direction:column;text-align:center;gap:8px}
-  .announce{font-size:10px;gap:10px;text-align:center;flex-wrap:wrap;justify-content:center}
-}
+  /* MOBILE */
+  @media (max-width: 800px) {
+    .wrap { padding: 0 20px; }
+    .hero { padding: 48px 0 64px; }
+    .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+    .steps { grid-template-columns: 1fr; gap: 32px; }
+    .offer-inner { grid-template-columns: 1fr; gap: 40px; padding: 0 20px; }
+    .how, .offer, .pricing { padding: 64px 0; }
+    .price-card { padding: 40px 24px; }
+    .price-big { font-size: 56px; }
+    footer { flex-direction: column; text-align: center; }
+    nav { padding: 20px 0; }
+    .nav-tag { display: none; }
+  }
 </style>
 </head>
 <body>
 
-<!-- ANNOUNCEMENT BAR -->
-<div class="announce">
-  <div class="announce-dot"></div>
-  <span><strong>2 of 3 founding spots remaining</strong> &mdash; 21 days free &middot; no card &middot; setup included</span>
-  <a href="https://wa.me/447711481659?text=Hey%2C%20I%27d%20like%20to%20claim%20a%20founding%20slot%20for%20CallCatch" target="_blank" rel="noopener">Claim yours &rarr;</a>
-</div>
-
 <div class="wrap">
+  <nav>
+    <div class="logo">Call<span>Catch</span>.</div>
+    <div class="nav-tag">Built in Belfast · For NI trades</div>
+  </nav>
 
-<!-- NAV -->
-<nav>
-  <div class="logo">Call<span>Catch</span>.</div>
-  <div class="contact-dropdown" id="contactDropdown">
-    <button class="contact-btn" type="button" onclick="document.getElementById('contactDropdown').classList.toggle('open')">Contact</button>
-    <div class="contact-menu">
-      <a href="https://wa.me/447711481659?text=Hey%2C%20I%27d%20like%20to%20claim%20a%20founding%20slot%20for%20CallCatch" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.46 14.05c-.23.65-1.35 1.24-1.88 1.32-.48.07-1.09.1-1.76-.11-.41-.13-.93-.3-1.6-.59-2.81-1.21-4.65-4.04-4.79-4.23-.14-.19-1.14-1.52-1.14-2.9 0-1.38.72-2.06.98-2.34.26-.28.57-.35.76-.35.19 0 .38 0 .55.01.18.01.41-.07.64.49.24.57.81 1.97.88 2.12.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.38-.42.51-.14.14-.28.29-.12.57.16.28.71 1.17 1.52 1.89 1.04.93 1.92 1.21 2.2 1.35.28.14.43.12.59-.07.16-.19.69-.81.87-1.08.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.27.14.46.21.52.32.07.12.07.69-.16 1.34z"/></svg>
-        WhatsApp
-      </a>
-      <a href="https://www.linkedin.com/in/dylan-mccooe-3a2359412" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
-        LinkedIn
-      </a>
-    </div>
-  </div>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-grid">
-    <div>
-      <div class="eyebrow">Missed call? Missed money.</div>
-      <h1>Stop losing<br>jobs to<br><em>voicemail.</em></h1>
-      <div class="hero-callout">
-        <strong>8 seconds</strong>&nbsp;— that's how fast the first text lands
-      </div>
-      <p class="hero-sub">CallCatch texts your missed callers back instantly, gets their name, postcode and what the job is — then sends a clean summary straight to your phone. You stay on the tools. You keep the lead.</p>
-      <div class="cta-row">
-        <a href="#signup" class="btn btn-primary">Start free trial <span class="arrow">→</span></a>
-        <a href="#demo" class="btn btn-secondary">See it live</a>
-      </div>
-      <div class="hero-trust">
-        <span class="trust-pill">No card</span>
-        <span class="trust-pill">No contract</span>
-        <span class="trust-pill">Cancel anytime</span>
-        <span class="trust-pill">25 min setup</span>
-      </div>
-    </div>
-    <div>
-      <div class="phone-frame">
-        <div class="phone-screen">
-          <div class="phone-notch"></div>
-          <div class="sms-thread">
-            <div class="sms-header">CallCatch &middot; Today</div>
-            <div class="sms-bubble in">Hi, on the tools — couldn't get to the phone. Drop me your name, postcode and what's wrong and I'll come back to ye in the hour. Cheers, Dylan.</div>
-            <div class="sms-bubble out">Hi John here BT9 — boiler not firing, no hot water since this morning, need someone today urgent</div>
-            <div class="sms-time">↓ 8 seconds later, on YOUR phone ↓</div>
-            <div class="sms-bubble summary">
-              <strong>New lead · +447700900123</strong>
-              Name: John<br>
-              Postcode: BT9<br>
-              Issue: boiler not firing / no hot water<br>
-              Urgency: high<br><br>
-              Reply to: +447700900123
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="phone-caption">Real AI<span>·</span>Real lead<span>·</span>Real fast</div>
-    </div>
-  </div>
-</section>
-
-</div><!-- /wrap -->
-
-<!-- STATS STRIP (full-width) -->
-<div style="background:var(--bg-card);border-top:1px solid var(--rule-soft);border-bottom:1px solid var(--rule-soft);position:relative;z-index:2">
-  <div class="wrap">
-    <div class="stats-strip">
-      <div class="stats-grid">
-        <div class="stat reveal">
-          <div class="stat-num">&lt;<em>8s</em></div>
-          <div class="stat-label">First text-back time</div>
-        </div>
-        <div class="stat reveal reveal-delay-1">
-          <div class="stat-num">3<em>×</em></div>
-          <div class="stat-label">More replies vs voicemail</div>
-        </div>
-        <div class="stat reveal reveal-delay-2">
-          <div class="stat-num">£<em>45</em></div>
-          <div class="stat-label">Per month, all-in</div>
-        </div>
-        <div class="stat reveal reveal-delay-3">
-          <div class="stat-num">25<em>m</em></div>
-          <div class="stat-label">Setup time, I do it for you</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="wrap">
-
-<!-- PROBLEM SECTION -->
-<section class="problem" id="problem">
-  <div class="problem-grid">
-    <div class="problem-left reveal">
-      <div class="section-label">The real cost</div>
-      <h2>A missed call<br>isn't a<br><em>minor thing.</em></h2>
-      <p>When your phone rings and you can't answer, the caller has three options: leave a voicemail nobody listens to, try a competitor, or give up. Two of those three mean you lose the job.</p>
-      <p>Voicemail doesn't qualify leads. It doesn't tell you if it's a £50 call-out or a £1,200 full rewire. CallCatch does.</p>
-    </div>
-    <div class="problem-right reveal reveal-delay-1">
-      <div class="problem-scenarios">
-        <div class="scenario">
-          <div class="scenario-trade">Plumber / Gas engineer</div>
-          <div class="scenario-text">"No hot water, boiler's completely dead, family of four, need someone today."</div>
-          <div class="scenario-cost">Potential job value: <strong>£150–£600</strong></div>
-        </div>
-        <div class="scenario">
-          <div class="scenario-trade">Electrician</div>
-          <div class="scenario-text">"Half the sockets in the house stopped working after I flipped a breaker."</div>
-          <div class="scenario-cost">Potential job value: <strong>£80–£400</strong></div>
-        </div>
-        <div class="scenario">
-          <div class="scenario-trade">Joiner / Handyman</div>
-          <div class="scenario-text">"We need a new back door fitted before the weekend, got measurements and everything."</div>
-          <div class="scenario-cost">Potential job value: <strong>£200–£800</strong></div>
-        </div>
-        <div class="scenario">
-          <div class="scenario-trade">Builder</div>
-          <div class="scenario-text">"Looking to get a quote for a single-storey extension, we've already got planning."</div>
-          <div class="scenario-cost">Potential job value: <strong>£15,000+</strong></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="how" id="how">
-  <div class="section-head reveal">
-    <h2>How it <em>works.</em></h2>
-    <div class="section-tag">3 steps · 25 min setup</div>
-  </div>
-  <div class="steps">
-    <div class="step reveal">
-      <div class="step-num">01</div>
-      <h3>You miss a call.</h3>
-      <p>Hands in a fusebox, under a sink, up a ladder. The caller hits your CallCatch number. Instead of voicemail, they get a text back in seconds.</p>
-    </div>
-    <div class="step reveal reveal-delay-1">
-      <div class="step-num">02</div>
-      <h3>AI texts them back.</h3>
-      <p>A friendly SMS goes out immediately, asking their name, postcode and what the job is. Our AI handles the back-and-forth naturally — it reads like you'd reply if you had ten seconds between jobs.</p>
-    </div>
-    <div class="step reveal reveal-delay-2">
-      <div class="step-num">03</div>
-      <h3>You get the lead.</h3>
-      <p>A clean summary lands on your phone — name, area, job type, urgency level, callback number. Ring them when you're free. Lead already qualified.</p>
-    </div>
-  </div>
-</section>
-
-</div><!-- /wrap -->
-
-<!-- COMPARISON TABLE -->
-<div style="border-top:1px solid var(--rule-soft);border-bottom:1px solid var(--rule-soft);background:var(--bg-card);position:relative;z-index:2">
-<div class="wrap">
-<section class="compare" id="compare" style="border:none">
-  <div class="section-head reveal">
-    <h2>Why not just<br>use <em>voicemail?</em></h2>
-    <div class="section-tag">Honest comparison</div>
-  </div>
-  <div class="compare-table-wrap reveal">
-    <table class="compare-table">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Voicemail</th>
-          <th>Part-time receptionist</th>
-          <th class="col-cc">CallCatch ✓</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Monthly cost</td>
-          <td>Free</td>
-          <td class="cost-bad">£600–£1,200</td>
-          <td class="col-cc cost-good">£45</td>
-        </tr>
-        <tr>
-          <td>Available after hours &amp; weekends</td>
-          <td class="check">✓</td>
-          <td class="cross">✗</td>
-          <td class="col-cc check">✓</td>
-        </tr>
-        <tr>
-          <td>Caller gets instant reply</td>
-          <td class="cross">✗</td>
-          <td>Sometimes</td>
-          <td class="col-cc highlight">&lt; 8 seconds, always</td>
-        </tr>
-        <tr>
-          <td>Captures name, postcode &amp; job</td>
-          <td class="cross">✗</td>
-          <td>Sometimes</td>
-          <td class="col-cc highlight">Every time</td>
-        </tr>
-        <tr>
-          <td>Clean lead summary to your phone</td>
-          <td class="cross">✗</td>
-          <td class="cross">✗</td>
-          <td class="col-cc check">✓</td>
-        </tr>
-        <tr>
-          <td>Works while you're mid-job</td>
-          <td class="check">✓</td>
-          <td class="cross">✗</td>
-          <td class="col-cc check">✓</td>
-        </tr>
-        <tr>
-          <td>Setup time</td>
-          <td>None</td>
-          <td>Weeks + onboarding</td>
-          <td class="col-cc highlight">25 minutes</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="compare-cta reveal">
-    <a href="#signup" class="btn btn-primary" style="margin-top:28px;display:inline-flex">Claim your founding slot <span class="arrow">→</span></a>
-  </div>
-</section>
-</div>
-</div>
-
-<!-- DEMO -->
-<section class="demo" id="demo">
-  <div class="demo-inner">
-    <div class="demo-head">
-      <div class="demo-eyebrow">Live system demo</div>
-      <h2>Watch the AI <em>extract a lead</em><br>in real time.</h2>
-      <p class="demo-sub">A stressed caller. Vague, unstructured message. Watch the AI parse, qualify, and pass it to your phone — in under 10 seconds.</p>
-    </div>
-    <div class="demo-grid">
-      <div class="demo-phone">
-        <div class="demo-phone-header">
-          <div class="demo-phone-status"></div>
-          <div class="demo-phone-label">Customer SMS</div>
-          <div class="demo-phone-time" id="demoTime">00:00</div>
-        </div>
-        <div class="demo-incoming" id="demoIncoming">
-          <div class="demo-incoming-from">+44 7700 900458 · INCOMING</div>
-          <div class="demo-incoming-msg">"Hi this is John from BT9, boiler isn't firing, no hot water since this morning, need someone today urgent"</div>
-        </div>
-        <div class="demo-msgs" id="demoMsgs">
-          <div class="demo-bubble in" data-show="auto-reply">Hi, on the tools — couldn't get to the phone. Drop me your name, postcode and what's wrong and I'll come back to ye in the hour. Cheers.</div>
-          <div class="demo-bubble out" data-show="customer-reply">Hi this is John from BT9, boiler isn't firing, no hot water since this morning, need someone today urgent</div>
-          <div class="demo-bubble summary" data-show="trader-summary">
-            <strong>✓ Sent to trader phone</strong>
-            Name: John<br>
-            Postcode: BT9<br>
-            Issue: boiler not firing / no hot water<br>
-            Urgency: high<br>
-            Reply to: +44 7700 900458
-          </div>
-        </div>
-      </div>
-      <div class="demo-engine">
-        <div class="demo-engine-head">
-          <div class="demo-engine-title">Triage Engine</div>
-          <div class="demo-engine-live">● Live</div>
-          <div class="demo-engine-tokens">T+<span id="demoElapsed">0.0s</span> · tokens: <span id="demoTokens">0</span></div>
-        </div>
-        <div class="demo-stage" id="stage1">
-          <div class="demo-stage-head"><div class="demo-stage-dot"></div><div class="demo-stage-name">Receiving call</div><div class="demo-stage-status">Standby</div></div>
-          <div class="demo-stage-detail">Waiting for inbound call event...</div>
-        </div>
-        <div class="demo-stage" id="stage2">
-          <div class="demo-stage-head"><div class="demo-stage-dot"></div><div class="demo-stage-name">Auto-reply sent</div><div class="demo-stage-status">Standby</div></div>
-          <div class="demo-stage-detail">SMS dispatched to caller via Twilio...</div>
-        </div>
-        <div class="demo-stage" id="stage3">
-          <div class="demo-stage-head"><div class="demo-stage-dot"></div><div class="demo-stage-name">Entity extraction</div><div class="demo-stage-status">Standby</div></div>
-          <div class="demo-stage-detail" id="stage3Detail">Awaiting customer reply...</div>
-        </div>
-        <div class="demo-stage" id="stage4">
-          <div class="demo-stage-head"><div class="demo-stage-dot"></div><div class="demo-stage-name">Urgency scoring</div><div class="demo-stage-status">Standby</div></div>
-          <div class="demo-stage-detail" id="stage4Detail">Pending qualification...</div>
-        </div>
-        <div class="demo-stage" id="stage5">
-          <div class="demo-stage-head"><div class="demo-stage-dot"></div><div class="demo-stage-name">Dispatch to trader</div><div class="demo-stage-status">Standby</div></div>
-          <div class="demo-stage-detail">Lead summary ready to send...</div>
-        </div>
-        <div class="demo-result" id="demoResult">
-          <div class="demo-result-label">✓ Lead delivered</div>
-          <div class="demo-result-text">High-urgency boiler job, BT9, ready for callback</div>
-        </div>
-      </div>
-    </div>
-    <div class="demo-controls">
-      <button class="demo-btn" id="demoBtn" type="button">▶ Run live demo</button>
-      <div class="demo-caption">Pre-recorded simulation · Same logic, same AI, real customer data</div>
-    </div>
-  </div>
-</section>
-
-<div class="wrap">
-
-<!-- FEATURES -->
-<section class="features" id="features">
-  <div class="section-head reveal">
-    <h2>What you <em>get.</em></h2>
-    <div class="section-tag">Everything included · No upsells</div>
-  </div>
-  <div class="features-grid">
-    <div class="feature reveal">
-      <div class="feature-icon">📱</div>
-      <h4>Any phone, any network</h4>
-      <p>iPhone, Android, even a Nokia. EE, O2, Vodafone, Three, giffgaff. No app to install, nothing to download.</p>
-    </div>
-    <div class="feature reveal reveal-delay-1">
-      <div class="feature-icon">⚙️</div>
-      <h4>I do the setup</h4>
-      <p>You don't touch any code. I buy your number, configure it, send you a 3-tap forwarding code. Done in 25 minutes.</p>
-    </div>
-    <div class="feature reveal reveal-delay-2">
-      <div class="feature-icon">🔒</div>
-      <h4>Cancel anytime</h4>
-      <p>No card on file during your free trial. No contract. If it's not catching leads, walk away — no hard feelings.</p>
-    </div>
-    <div class="feature reveal reveal-delay-3">
-      <div class="feature-icon">📍</div>
-      <h4>Built for NI numbers</h4>
-      <p>Dedicated +44 mobile number, local to you. Works 24/7 — even when you're asleep, even when you're under a sink.</p>
-    </div>
-  </div>
-</section>
-
-<!-- BUILT BY -->
-<section class="built-by" id="about">
-  <div class="built-by-inner reveal">
-    <div class="builder-header">
-      <div class="builder-photo">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-      </div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-grid">
       <div>
-        <div class="builder-name">Dylan McCooe</div>
-        <div class="builder-role">Founder · <a href="https://www.linkedin.com/in/dylan-mccooe-3a2359412" target="_blank" rel="noopener">LinkedIn</a></div>
+        <div class="eyebrow">Missed call? Missed money.</div>
+        <h1>AI catches<br>the calls<br>you <em>miss.</em></h1>
+        <p class="hero-sub">When you can't answer, CallCatch texts the caller back, gets their name, postcode and what they need — then sends it straight to your phone.</p>
+        <div class="cta-row">
+          <a href="#offer" class="btn btn-primary">Claim a free slot</a>
+          <a href="#how" class="btn btn-secondary">How it works</a>
+        </div>
+      </div>
+
+      <div class="phone-mock">
+        <div class="phone-header">
+          <span>SMS · TO YOUR PHONE</span>
+          <span>NOW</span>
+        </div>
+        <div class="sms-bubble">
+          <strong>New lead — John, BT9</strong><br>
+          Boiler not firing, no hot water. Wants someone today if possible. Reply to: 07700 900123
+        </div>
+        <div class="sms-meta">— sent 8 seconds after the missed call —</div>
       </div>
     </div>
-    <div class="eyebrow" style="color:var(--accent)">Built by a founder, for the trades</div>
-    <h2>19. First year.<br><em>Solo.</em></h2>
-    <p>Business IT student at Queen's University Belfast. I built CallCatch on my own — every line of code, the AI prompt that captures the lead, the whole thing.</p>
-    <p class="soft">Most missed-call tools cost £100+ a month and are built for big firms with receptionists. CallCatch is built for the person in the van who just wants the leads to stop slipping. I couldn't find anything decent at a tradesman's price point in Northern Ireland, so I made it.</p>
-    <p class="soft">If you sign up as one of the first 3 customers, you're shaping what this becomes. Tell me what works, what's missing, what's broken. I'll fix it fast.</p>
-    <div class="builder-credits">
-      <div class="builder-credit">
-        <span class="builder-credit-label">Studying</span>
-        <span class="builder-credit-value">BIT, Queen's University Belfast</span>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="how">
+    <div class="section-head">
+      <h2>How it works.</h2>
+      <div class="section-tag">3 steps · 25 min setup</div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>You miss a call.</h3>
+        <p>Phone's in the van, hands are in a fusebox, you're under a sink. Whatever it is, the caller hits your CallCatch number instead of voicemail.</p>
       </div>
-      <div class="builder-credit">
-        <span class="builder-credit-label">Built with</span>
-        <span class="builder-credit-value">Python · Twilio · AI</span>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>AI texts them back.</h3>
+        <p>Within seconds, the caller gets a friendly SMS asking their name, postcode and what the job is. Claude AI handles the back-and-forth.</p>
       </div>
-      <div class="builder-credit">
-        <span class="builder-credit-label">Connect</span>
-        <span class="builder-credit-value"><a href="https://www.linkedin.com/in/dylan-mccooe-3a2359412" target="_blank" rel="noopener">LinkedIn</a></span>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>You get the lead.</h3>
+        <p>A clean summary lands on your phone — name, area, job, callback number. You ring them back when you're free, lead already qualified.</p>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-</div><!-- /wrap -->
-
-<!-- OFFER -->
-<section class="offer" id="offer">
-  <div class="offer-inner">
-    <div class="reveal">
-      <div class="eyebrow">Founding offer</div>
-      <h2>First 3 customers.<br>21 days <em>free.</em></h2>
-      <p>I need 3 real trades using CallCatch before I start charging properly. You get 21 days free — no card, no contract. All I ask is an honest review at the end.</p>
-      <p>If it works, stay on at £45/mo. If it doesn't, tell me why and we part ways. No pressure, no awkwardness.</p>
-      <a href="https://wa.me/447711481659?text=Hey%2C%20I%27d%20like%20to%20claim%20a%20founding%20slot%20for%20CallCatch" class="btn btn-primary" target="_blank" rel="noopener">
-        <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.46 14.05c-.23.65-1.35 1.24-1.88 1.32-.48.07-1.09.1-1.76-.11-.41-.13-.93-.3-1.6-.59-2.81-1.21-4.65-4.04-4.79-4.23-.14-.19-1.14-1.52-1.14-2.9 0-1.38.72-2.06.98-2.34.26-.28.57-.35.76-.35.19 0 .38 0 .55.01.18.01.41-.07.64.49.24.57.81 1.97.88 2.12.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.38-.42.51-.14.14-.28.29-.12.57.16.28.71 1.17 1.52 1.89 1.04.93 1.92 1.21 2.2 1.35.28.14.43.12.59-.07.16-.19.69-.81.87-1.08.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.27.14.46.21.52.32.07.12.07.69-.16 1.34z"/></svg>
-        WhatsApp to claim
-      </a>
-    </div>
-    <ul class="offer-list reveal reveal-delay-1">
-      <li>No card, no contract — ever</li>
-      <li>No hidden costs or setup charges</li>
-      <li>25-minute setup, I do everything</li>
-      <li>Cancel any time, no questions</li>
-      <li>Direct WhatsApp line to me, always</li>
-      <li>Worst case: you've lost nothing</li>
-    </ul>
-  </div>
-</section>
-
-<div class="wrap">
-
-<!-- FAQ -->
-<section class="faq" id="faq">
-  <div class="section-head reveal">
-    <h2>The <em>questions</em><br>I get asked.</h2>
-    <div class="section-tag">Real answers</div>
-  </div>
-  <div class="faq-list">
-    <details>
-      <summary>Will the customer know it's a bot texting them?</summary>
-      <p>The text says "Hi, on the tools — couldn't get to the phone." It reads exactly like you'd reply if you had ten seconds between jobs. Most customers don't notice — they just want their job sorted.</p>
-    </details>
-    <details>
-      <summary>What if I'm somewhere with no signal?</summary>
-      <p>Your CallCatch number lives in the cloud — not on your physical phone. As long as Twilio is up, missed calls still trigger the text-back. Your phone signal only matters for receiving the final lead summary, which lands the moment you're back in coverage.</p>
-    </details>
-    <details>
-      <summary>Can I cancel anytime?</summary>
-      <p>Yes. No contract, no notice period. During the free trial there's no card on file — I literally can't charge you. After the trial, WhatsApp me "cancel" and I deactivate your number same day.</p>
-    </details>
-    <details>
-      <summary>What if the AI says something wrong to my customer?</summary>
-      <p>The AI is very good at extracting name/postcode/job from a message, but it's not perfect. If a customer sends something confusing, the AI still passes you the raw text so you have full context. You always see the original message too.</p>
-    </details>
-    <details>
-      <summary>How is this different from voicemail?</summary>
-      <p>Voicemail is one-way and most callers don't leave one. CallCatch starts a real text conversation in seconds, captures structured info, and delivers it clean to your phone. Higher response rate, zero effort.</p>
-    </details>
-    <details>
-      <summary>What happens after the 21-day trial?</summary>
-      <p>Day 18 I'll WhatsApp you: "Worth continuing?" If yes — £45/mo, paid by bank transfer or Stripe. If no — I deactivate your number. No automatic charges, no surprise emails.</p>
-    </details>
-  </div>
-</section>
-
-</div><!-- /wrap -->
-
-<!-- SIGNUP FORM -->
-<section class="signup" id="signup">
-  <div class="signup-inner">
-    <div class="signup-left reveal">
-      <div class="pill">21-day free trial</div>
-      <h2>Start catching<br><em>jobs</em> today.</h2>
-      <p>No card. No contract. Setup takes under 25 minutes — I do it all for you.</p>
-      <p>Fill in the form and I'll WhatsApp you to schedule setup. You'll be live before your next missed call.</p>
-      <ul class="signup-bullets">
-        <li>21 days free, no card required</li>
-        <li>I handle the entire setup personally</li>
-        <li>Cancel anytime — no questions</li>
-        <li>Works with your existing phone number</li>
+  <!-- OFFER -->
+  <section class="offer" id="offer">
+    <div class="offer-inner">
+      <div>
+        <div class="eyebrow">Founding offer</div>
+        <h2>3 lads.<br>30 days <em>free.</em></h2>
+        <p>I'm Dylan, 19, studying Business IT at Queen's. I've built CallCatch and I want to test it with real trades before charging full whack.</p>
+        <p>First 3 customers get 30 days completely free. All I ask back is an honest review at the end.</p>
+        <a href="mailto:dylan@callcatch.uk?subject=Founding%20slot%20-%20CallCatch" class="btn btn-primary">Email me to claim</a>
+      </div>
+      <ul class="offer-list">
+        <li>No card, no contract</li>
+        <li>No hidden cost</li>
+        <li>25-minute setup, I do it for you</li>
+        <li>Cancel any time, no questions</li>
+        <li>Worst case: you've lost nothing</li>
       </ul>
     </div>
-    <div class="signup-card reveal reveal-delay-1">
-      <form id="signupForm" onsubmit="return submitSignup(event)">
-        <div class="form-row">
-          <div class="form-field">
-            <label for="firstName">First name</label>
-            <input type="text" id="firstName" name="firstName" placeholder="Rhys" required>
-          </div>
-          <div class="form-field">
-            <label for="lastName">Last name</label>
-            <input type="text" id="lastName" name="lastName" placeholder="Smith" required>
-          </div>
-        </div>
-        <div class="form-field">
-          <label for="businessName">Business name</label>
-          <input type="text" id="businessName" name="businessName" placeholder="Smith Gas &amp; Heating" required>
-        </div>
-        <div class="form-field">
-          <label for="mobile">Mobile number</label>
-          <input type="tel" id="mobile" name="mobile" placeholder="07XXX XXXXXX" required>
-        </div>
-        <div class="form-field">
-          <label for="trade">Your trade</label>
-          <select id="trade" name="trade" required>
-            <option value="">Select your trade...</option>
-            <option value="plumber">Plumber / Gas</option>
-            <option value="electrician">Electrician</option>
-            <option value="joiner">Joiner / Carpenter</option>
-            <option value="builder">Builder</option>
-            <option value="handyman">Handyman</option>
-            <option value="roofer">Roofer</option>
-            <option value="painter">Painter / Decorator</option>
-            <option value="locksmith">Locksmith</option>
-            <option value="other">Other trade</option>
-          </select>
-        </div>
-        <div class="plan-group">
-          <span class="plan-group-label">Choose your plan</span>
-          <div class="plan-options">
-            <label class="plan-option selected" data-plan="founding">
-              <input type="radio" name="plan" value="founding" checked>
-              <div class="plan-tag">Limited spots</div>
-              <div class="plan-option-title">Founding customer</div>
-              <div class="plan-option-price">21 days free · £45/mo after · Setup waived</div>
-            </label>
-            <label class="plan-option" data-plan="standard">
-              <input type="radio" name="plan" value="standard">
-              <div class="plan-option-title">Standard</div>
-              <div class="plan-option-price">£45/mo · £200 one-time setup</div>
-            </label>
-          </div>
-        </div>
-        <button type="submit" class="form-submit">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.46 14.05c-.23.65-1.35 1.24-1.88 1.32-.48.07-1.09.1-1.76-.11-.41-.13-.93-.3-1.6-.59-2.81-1.21-4.65-4.04-4.79-4.23-.14-.19-1.14-1.52-1.14-2.9 0-1.38.72-2.06.98-2.34.26-.28.57-.35.76-.35.19 0 .38 0 .55.01.18.01.41-.07.64.49.24.57.81 1.97.88 2.12.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.38-.42.51-.14.14-.28.29-.12.57.16.28.71 1.17 1.52 1.89 1.04.93 1.92 1.21 2.2 1.35.28.14.43.12.59-.07.16-.19.69-.81.87-1.08.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.27.14.46.21.52.32.07.12.07.69-.16 1.34z"/></svg>
-          Claim my founding slot
-        </button>
-        <p class="form-disclaimer">Submitting opens <strong>WhatsApp</strong> with your details pre-filled. <strong>No card needed.</strong></p>
-      </form>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing">
+    <div class="section-head">
+      <h2>After the free month.</h2>
+      <div class="section-tag">No surprises · Cancel anytime</div>
     </div>
-  </div>
-</section>
-
-<div class="wrap">
-
-<!-- PRICING -->
-<section class="pricing" id="pricing">
-  <div class="section-head reveal">
-    <h2>After the <em>free</em> trial.</h2>
-    <div class="section-tag">No surprises · Cancel anytime</div>
-  </div>
-  <div class="price-card reveal">
-    <div class="price-big">£45<span>/mo</span></div>
-    <div class="price-period">Everything included</div>
-    <div class="price-setup">
-      <strong>+ £200 one-time setup</strong>
-      <em>Waived for founding customers.</em>
+    <div class="price-card">
+      <div class="price-big">£45<span>/mo</span></div>
+      <div class="price-period">Standard tier</div>
+      <div class="price-setup">+ £200 one-time setup<br><small>(waived for founding 3)</small></div>
+      <ul class="price-features">
+        <li>Unlimited missed-call replies</li>
+        <li>AI-qualified lead summaries to your phone</li>
+        <li>Your own dedicated NI number</li>
+        <li>Works with any phone, any network</li>
+        <li>I handle the setup end-to-end</li>
+      </ul>
+      <a href="mailto:dylan@callcatch.uk?subject=CallCatch%20enquiry" class="btn btn-primary">Get in touch</a>
     </div>
-    <ul class="price-features">
-      <li>Unlimited missed-call text-backs</li>
-      <li>AI-qualified lead summaries to your phone</li>
-      <li>Your own dedicated NI mobile number</li>
-      <li>Works with any phone, any network</li>
-      <li>I handle the setup end-to-end</li>
-      <li>Direct WhatsApp support from me personally</li>
-    </ul>
-    <a href="https://wa.me/447711481659?text=Hey%2C%20I%27d%20like%20to%20claim%20a%20founding%20slot%20for%20CallCatch" class="btn btn-primary" target="_blank" rel="noopener">
-      <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.46 14.05c-.23.65-1.35 1.24-1.88 1.32-.48.07-1.09.1-1.76-.11-.41-.13-.93-.3-1.6-.59-2.81-1.21-4.65-4.04-4.79-4.23-.14-.19-1.14-1.52-1.14-2.9 0-1.38.72-2.06.98-2.34.26-.28.57-.35.76-.35.19 0 .38 0 .55.01.18.01.41-.07.64.49.24.57.81 1.97.88 2.12.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.38-.42.51-.14.14-.28.29-.12.57.16.28.71 1.17 1.52 1.89 1.04.93 1.92 1.21 2.2 1.35.28.14.43.12.59-.07.16-.19.69-.81.87-1.08.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.27.14.46.21.52.32.07.12.07.69-.16 1.34z"/></svg>
-      Claim your founding slot
-    </a>
-  </div>
-</section>
+  </section>
 
-<!-- FINAL CTA -->
-<section class="final-cta">
-  <h2 class="reveal">Stop losing leads<br>to <em>voicemail.</em></h2>
-  <p class="reveal reveal-delay-1">Takes 25 minutes to set up. Costs you nothing for 21 days. WhatsApp me and we'll get you live tonight if you're keen.</p>
-  <a href="https://wa.me/447711481659?text=Hey%2C%20I%27d%20like%20to%20claim%20a%20founding%20slot%20for%20CallCatch" class="btn btn-primary reveal reveal-delay-2" target="_blank" rel="noopener">
-    <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91C21.95 6.45 17.5 2 12.04 2zm5.46 14.05c-.23.65-1.35 1.24-1.88 1.32-.48.07-1.09.1-1.76-.11-.41-.13-.93-.3-1.6-.59-2.81-1.21-4.65-4.04-4.79-4.23-.14-.19-1.14-1.52-1.14-2.9 0-1.38.72-2.06.98-2.34.26-.28.57-.35.76-.35.19 0 .38 0 .55.01.18.01.41-.07.64.49.24.57.81 1.97.88 2.12.07.15.12.32.02.51-.09.19-.14.31-.28.48-.14.17-.29.38-.42.51-.14.14-.28.29-.12.57.16.28.71 1.17 1.52 1.89 1.04.93 1.92 1.21 2.2 1.35.28.14.43.12.59-.07.16-.19.69-.81.87-1.08.18-.28.36-.23.61-.14.25.09 1.6.75 1.87.89.27.14.46.21.52.32.07.12.07.69-.16 1.34z"/></svg>
-    WhatsApp now
-  </a>
-</section>
+  <footer>
+    <div>© 2026 CallCatch · Belfast</div>
+    <div><a href="mailto:dylan@callcatch.uk">dylan@callcatch.uk</a></div>
+  </footer>
+</div>
 
-<footer>
-  <div>© 2026 CallCatch · Built in Belfast</div>
-  <div><a href="https://wa.me/447711481659" target="_blank" rel="noopener">WhatsApp</a> · <a href="https://www.linkedin.com/in/dylan-mccooe-3a2359412" target="_blank" rel="noopener">LinkedIn</a></div>
-</footer>
-
-</div><!-- /wrap -->
-
-<script>
-document.addEventListener('click', function(e) {
-  var d = document.getElementById('contactDropdown');
-  if (d && !d.contains(e.target)) d.classList.remove('open');
-});
-
-// Scroll reveal
-(function() {
-  var els = document.querySelectorAll('.reveal');
-  if (!('IntersectionObserver' in window)) {
-    els.forEach(function(el) { el.classList.add('visible'); });
-    return;
-  }
-  var io = new IntersectionObserver(function(entries) {
-    entries.forEach(function(entry) {
-      if (entry.isIntersecting) { entry.target.classList.add('visible'); io.unobserve(entry.target); }
-    });
-  }, { threshold: 0.1 });
-  els.forEach(function(el) { io.observe(el); });
-})();
-
-// AI Demo
-(function() {
-  var btn = document.getElementById('demoBtn');
-  if (!btn) return;
-  var running = false, tids = [];
-
-  function reset() {
-    tids.forEach(clearTimeout); tids = [];
-    document.querySelectorAll('.demo-stage').forEach(function(s) {
-      s.classList.remove('active','done');
-      var st = s.querySelector('.demo-stage-status');
-      if (st) st.textContent = 'Standby';
-    });
-    document.querySelectorAll('.demo-bubble').forEach(function(b) { b.classList.remove('show'); });
-    document.getElementById('demoIncoming').style.display = 'none';
-    document.getElementById('demoResult').classList.remove('show');
-    document.getElementById('demoElapsed').textContent = '0.0s';
-    document.getElementById('demoTokens').textContent = '0';
-    document.getElementById('demoTime').textContent = '00:00';
-    document.getElementById('stage3Detail').innerHTML = 'Awaiting customer reply...';
-    document.getElementById('stage4Detail').innerHTML = 'Pending qualification...';
-  }
-
-  function setStage(id, state, status, detail) {
-    var s = document.getElementById(id); if (!s) return;
-    s.classList.remove('active','done'); s.classList.add(state);
-    var st = s.querySelector('.demo-stage-status'); if (st) st.textContent = status;
-    if (detail !== undefined) { var d = s.querySelector('.demo-stage-detail'); if (d) d.innerHTML = detail; }
-  }
-
-  function show(attr) { var el = document.querySelector('[data-show="'+attr+'"]'); if (el) el.classList.add('show'); }
-  function meters(t, tok) { document.getElementById('demoElapsed').textContent = t+'s'; document.getElementById('demoTokens').textContent = tok; }
-
-  function run() {
-    if (running) return; running = true; btn.disabled = true; btn.textContent = '⟳ Running...'; reset();
-    tids.push(setTimeout(function(){ document.getElementById('demoTime').textContent='14:23'; setStage('stage1','active','Active','Inbound call from +44 7700 900458 · 4 rings · unanswered'); meters('0.2',28); },400));
-    tids.push(setTimeout(function(){ setStage('stage1','done','✓ Done','Call missed · routing to text-back flow'); setStage('stage2','active','Active','Generating personalised auto-reply...'); show('auto-reply'); meters('1.1',142); },1400));
-    tids.push(setTimeout(function(){ setStage('stage2','done','✓ Sent','SMS delivered to caller'); meters('2.3',198); },2400));
-    tids.push(setTimeout(function(){ document.getElementById('demoIncoming').style.display='block'; show('customer-reply'); setStage('stage3','active','Parsing','Analysing 18 tokens of inbound message...'); meters('3.5',220); },3500));
-    tids.push(setTimeout(function(){ document.getElementById('stage3Detail').innerHTML='<span class="extracted">name: John</span><span class="extracted">postcode: BT9</span><span class="extracted">issue: boiler not firing</span>'; meters('4.2',312); },4500));
-    tids.push(setTimeout(function(){ setStage('stage3','done','✓ Extracted','<span class="extracted">name: John</span><span class="extracted">postcode: BT9</span><span class="extracted">issue: boiler not firing</span>'); setStage('stage4','active','Scoring','Cross-referencing urgency signals...'); meters('5.4',388); },5500));
-    tids.push(setTimeout(function(){ setStage('stage4','done','✓ Scored','<span class="extracted">urgency: HIGH</span> · keywords: "today", "urgent", "no hot water"'); setStage('stage5','active','Dispatching','Formatting trader summary SMS...'); meters('6.5',412); },6500));
-    tids.push(setTimeout(function(){ setStage('stage5','done','✓ Dispatched','Summary sent to trader phone via Twilio'); show('trader-summary'); document.getElementById('demoResult').classList.add('show'); meters('7.8',456); btn.textContent='↺ Run again'; btn.disabled=false; running=false; },7700));
-  }
-  btn.addEventListener('click', run);
-})();
-
-// Plan radio + signup form
-(function() {
-  document.querySelectorAll('.plan-option').forEach(function(opt) {
-    opt.addEventListener('click', function() {
-      document.querySelectorAll('.plan-option').forEach(function(o) { o.classList.remove('selected'); });
-      opt.classList.add('selected');
-      var r = opt.querySelector('input[type="radio"]'); if (r) r.checked = true;
-    });
-  });
-
-  window.submitSignup = function(e) {
-    e.preventDefault();
-    var fn = document.getElementById('firstName').value.trim();
-    var ln = document.getElementById('lastName').value.trim();
-    var biz = document.getElementById('businessName').value.trim();
-    var mob = document.getElementById('mobile').value.trim();
-    var trade = document.getElementById('trade');
-    var tradeLabel = trade.options[trade.selectedIndex].textContent;
-    var plan = document.querySelector('input[name="plan"]:checked').value;
-    var planLabel = plan === 'founding' ? 'Founding customer (21-day free trial)' : 'Standard plan';
-    var msg = "Hey, I'd like to claim a CallCatch slot.\n\nName: "+fn+" "+ln+"\nBusiness: "+biz+"\nMobile: "+mob+"\nTrade: "+tradeLabel+"\nPlan: "+planLabel;
-    window.location.href = "https://wa.me/447711481659?text=" + encodeURIComponent(msg);
-    return false;
-  };
-})();
-</script>
 </body>
 </html>
-
