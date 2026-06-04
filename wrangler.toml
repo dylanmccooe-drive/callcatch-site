@@ -1,0 +1,7 @@
+name = "callcatch"
+compatibility_date = "2026-06-04"
+main = "src/worker.js"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"

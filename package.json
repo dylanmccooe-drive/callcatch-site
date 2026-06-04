@@ -1,0 +1,21 @@
+{
+  "name": "callcatch-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CallCatch landing page",
+  "scripts": {
+    "build": "mkdir -p dist && cp index.html dist/index.html",
+    "dev": "npx serve .",
+    "start": "npx serve dist",
+    "lint": "echo \"No lint configured for static site\"",
+    "typecheck": "echo \"No TypeScript build for static site\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dylanmccooe-drive/callcatch-site.git"
+  },
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "wrangler": "^4.56.0"
+  }
+}
