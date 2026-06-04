@@ -26,9 +26,11 @@
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; min-height: 100%; overflow-y: auto; }
 
   body {
+    min-height: 100%;
+    overflow-y: auto;
     background: var(--bg);
     color: var(--ink);
     font-family: var(--display);
@@ -1469,7 +1471,7 @@
   <nav>
     <a class="logo" href="/" style="color:inherit;text-decoration:none;">Call<span>Catch</span>.</a>
     <div class="nav-actions">
-    <a class="nav-link" href="/dashboard.html">Dashboard preview</a>
+    <a class="nav-link" href="/dashboard.html">Dashboard</a>
     <a class="nav-cta" href="/signup.html">Start trial</a>
     <div class="contact-dropdown" id="contactDropdown">
       <button class="contact-btn" type="button" onclick="document.getElementById('contactDropdown').classList.toggle('open')">Contact</button>
