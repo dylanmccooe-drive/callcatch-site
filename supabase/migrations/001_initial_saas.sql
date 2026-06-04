@@ -9,24 +9,8 @@ create table if not exists public.customers (
   business_name text,
   mobile text,
   trade text,
-  stripe_customer_id text unique,
   onboarding_status text not null default 'signup',
   callcatch_number text,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
-);
-
-create table if not exists public.subscriptions (
-  id uuid primary key default gen_random_uuid(),
-  customer_id uuid not null references public.customers(id) on delete cascade,
-  stripe_subscription_id text not null unique,
-  stripe_price_id text,
-  status text not null,
-  trial_start timestamptz,
-  trial_end timestamptz,
-  current_period_start timestamptz,
-  current_period_end timestamptz,
-  cancel_at_period_end boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -51,44 +35,39 @@ create trigger set_customers_updated_at
 before update on public.customers
 for each row execute function public.set_updated_at();
 
-drop trigger if exists set_subscriptions_updated_at on public.subscriptions;
-create trigger set_subscriptions_updated_at
-before update on public.subscriptions
-for each row execute function public.set_updated_at();
-
 alter table public.customers enable row level security;
-alter table public.subscriptions enable row level security;
 alter table public.admin_users enable row level security;
 
-drop policy if exists "customers can read own profile" on public.customers;
-create policy "customers can read own profile"
+drop policy if exists "customers can insert own row" on public.customers;
+create policy "customers can insert own row"
+on public.customers for insert
+to authenticated
+with check (auth.uid() = user_id);
+
+drop policy if exists "customers can read own row" on public.customers;
+create policy "customers can read own row"
 on public.customers for select
+to authenticated
 using (auth.uid() = user_id);
 
-drop policy if exists "customers can update own profile" on public.customers;
-create policy "customers can update own profile"
+drop policy if exists "customers can update own row" on public.customers;
+create policy "customers can update own row"
 on public.customers for update
+to authenticated
 using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
 
-drop policy if exists "customers can read own subscriptions" on public.subscriptions;
-create policy "customers can read own subscriptions"
-on public.subscriptions for select
-using (
-  exists (
-    select 1
-    from public.customers
-    where customers.id = subscriptions.customer_id
-      and customers.user_id = auth.uid()
-  )
-);
+drop policy if exists "admins can read all customers" on public.customers;
+create policy "admins can read all customers"
+on public.customers for select
+to authenticated
+using (exists (select 1 from public.admin_users where admin_users.user_id = auth.uid()));
 
-drop policy if exists "admins can read admin users" on public.admin_users;
-create policy "admins can read admin users"
+drop policy if exists "admins can read admin table" on public.admin_users;
+create policy "admins can read admin table"
 on public.admin_users for select
+to authenticated
 using (auth.uid() = user_id);
 
 create index if not exists customers_user_id_idx on public.customers(user_id);
-create index if not exists customers_stripe_customer_id_idx on public.customers(stripe_customer_id);
-create index if not exists subscriptions_customer_id_idx on public.subscriptions(customer_id);
-create index if not exists subscriptions_status_idx on public.subscriptions(status);
+create index if not exists customers_created_at_idx on public.customers(created_at desc);
