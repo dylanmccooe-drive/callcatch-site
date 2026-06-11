@@ -39,10 +39,13 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;back
 ::selection{background:var(--accent);color:#fff}
 
 /* ── ANNOUNCE BAR ── */
-.announce{background:var(--ink);color:var(--bg);padding:11px var(--gutter);display:flex;align-items:center;justify-content:center;gap:16px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;position:sticky;top:0;z-index:200}
+.announce{background:var(--ink);color:var(--bg);padding:11px var(--gutter);display:flex;align-items:center;justify-content:center;gap:16px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;position:sticky;top:0;z-index:200;overflow:hidden}
+.announce::after{content:"";position:absolute;top:0;left:-50%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.10),transparent);pointer-events:none;animation:announce-sweep 5.5s ease-in-out infinite}
+@keyframes announce-sweep{0%{left:-50%}55%{left:130%}100%{left:130%}}
+@keyframes announce-glow{0%,100%{text-shadow:0 0 0 rgba(217,79,30,0)}50%{text-shadow:0 0 14px rgba(217,79,30,.55)}}
 .announce-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse-dot 2s ease-in-out infinite;flex-shrink:0}
 @keyframes pulse-dot{0%,100%{box-shadow:0 0 0 0 rgba(217,79,30,.5)}50%{box-shadow:0 0 0 7px rgba(217,79,30,0)}}
-.announce strong{color:var(--accent)}
+.announce strong{color:var(--accent);animation:announce-glow 2.6s ease-in-out infinite}
 .announce a{color:inherit;text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
 .announce a:hover{color:var(--accent)}
 
@@ -121,6 +124,22 @@ h1 em{font-style:italic;font-weight:400;color:var(--accent);font-variation-setti
 .stat-num{font-family:var(--display);font-weight:900;font-size:clamp(40px,5vw,64px);line-height:1;letter-spacing:-.04em;color:var(--ink);font-variation-settings:"opsz" 144;margin-bottom:6px}
 .stat-num em{font-style:italic;color:var(--accent);font-weight:400}
 .stat-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.15em;color:var(--ink-muted);font-weight:500}
+.problem-stats{background:var(--bg-dark);color:var(--bg);position:relative;z-index:2}
+.problem-stats .ps-eyebrow{text-align:center;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);padding-top:56px}
+.problem-stats .ps-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;padding:28px 0}
+.problem-stats .ps-stat{padding:0 28px;border-right:1px solid rgba(255,255,255,.12);text-align:center}
+.problem-stats .ps-stat:last-child{border-right:none}
+.problem-stats .ps-num{font-family:var(--display);font-weight:900;font-size:clamp(40px,5vw,64px);line-height:1;letter-spacing:-.04em;color:var(--bg);font-variation-settings:"opsz" 144;margin-bottom:8px}
+.problem-stats .ps-num em{font-style:italic;color:var(--accent);font-weight:400}
+.problem-stats .ps-label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:rgba(245,242,235,.5);font-weight:500;line-height:1.45}
+.problem-stats .ps-source{text-align:center;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;color:rgba(245,242,235,.32);padding-bottom:56px;text-transform:uppercase}
+@media (max-width:768px){
+  .problem-stats .ps-grid{grid-template-columns:1fr;gap:0;padding:20px 0}
+  .problem-stats .ps-stat{padding:22px 0;border-right:none;border-bottom:1px solid rgba(255,255,255,.12)}
+  .problem-stats .ps-stat:last-child{border-bottom:none}
+  .problem-stats .ps-eyebrow{padding-top:44px}
+  .problem-stats .ps-source{padding-bottom:44px}
+}
 
 /* ── PROBLEM SECTION ── */
 .problem{padding:120px 0;border-bottom:1px solid var(--rule-soft)}
@@ -394,7 +413,7 @@ footer a:hover{color:var(--accent)}
 <!-- ANNOUNCEMENT BAR -->
 <div class="announce">
   <div class="announce-dot"></div>
-  <span><strong>2 of 3 founding spots remaining</strong> &mdash; 21 days free &middot; no card &middot; setup included</span>
+  <span><strong>3 founding spots open</strong> &mdash; 21 days free &middot; no card &middot; setup included</span>
   <a href="https://wa.me/447711481659?text=Hey%2C%20I%27d%20like%20to%20claim%20a%20founding%20slot%20for%20CallCatch" target="_blank" rel="noopener">Claim yours &rarr;</a>
 </div>
 
@@ -465,6 +484,19 @@ footer a:hover{color:var(--accent)}
 </section>
 
 </div><!-- /wrap -->
+
+<!-- PROBLEM STATS (dark) -->
+<div class="problem-stats">
+  <div class="wrap">
+    <div class="ps-eyebrow">Why answering first wins the job</div>
+    <div class="ps-grid">
+      <div class="ps-stat reveal"><div class="ps-num">21<em>×</em></div><div class="ps-label">more likely to win a job when you reply within 5 minutes</div></div>
+      <div class="ps-stat reveal reveal-delay-1"><div class="ps-num">78<em>%</em></div><div class="ps-label">of customers hire the first business that gets back to them</div></div>
+      <div class="ps-stat reveal reveal-delay-2"><div class="ps-num">47<em>hrs</em></div><div class="ps-label">average time a business takes to reply. CallCatch replies in seconds</div></div>
+    </div>
+    <div class="ps-source">Sources: Harvard Business Review · MIT · Lead Connect</div>
+  </div>
+</div>
 
 <!-- STATS STRIP (full-width) -->
 <div style="background:var(--bg-card);border-top:1px solid var(--rule-soft);border-bottom:1px solid var(--rule-soft);position:relative;z-index:2">
@@ -644,7 +676,7 @@ footer a:hover{color:var(--accent)}
           <div class="demo-phone-time" id="demoTime">00:00</div>
         </div>
         <div class="demo-incoming" id="demoIncoming">
-          <div class="demo-incoming-from">+44 7700 900458 · INCOMING</div>
+          <div class="demo-incoming-from">+44 7700 900123 · INCOMING</div>
           <div class="demo-incoming-msg">"Hi this is John from BT9, boiler isn't firing, no hot water since this morning, need someone today urgent"</div>
         </div>
         <div class="demo-msgs" id="demoMsgs">
@@ -656,7 +688,7 @@ footer a:hover{color:var(--accent)}
             Postcode: BT9<br>
             Issue: boiler not firing / no hot water<br>
             Urgency: high<br>
-            Reply to: +44 7700 900458
+            Reply to: +44 7700 900123
           </div>
         </div>
       </div>
@@ -709,22 +741,22 @@ footer a:hover{color:var(--accent)}
   </div>
   <div class="features-grid">
     <div class="feature reveal">
-      <div class="feature-icon">📱</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg></div>
       <h4>Any phone, any network</h4>
       <p>iPhone, Android, even a Nokia. EE, O2, Vodafone, Three, giffgaff. No app to install, nothing to download.</p>
     </div>
     <div class="feature reveal reveal-delay-1">
-      <div class="feature-icon">⚙️</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
       <h4>I do the setup</h4>
       <p>You don't touch any code. I buy your number, configure it, send you a 3-tap forwarding code. Done in 25 minutes.</p>
     </div>
     <div class="feature reveal reveal-delay-2">
-      <div class="feature-icon">🔒</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
       <h4>Cancel anytime</h4>
       <p>No card on file during your free trial. No contract. If it's not catching leads, walk away — no hard feelings.</p>
     </div>
     <div class="feature reveal reveal-delay-3">
-      <div class="feature-icon">📍</div>
+      <div class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="28" height="28"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
       <h4>Built for NI numbers</h4>
       <p>Dedicated +44 mobile number, local to you. Works 24/7 — even when you're asleep, even when you're under a sink.</p>
     </div>
@@ -1008,7 +1040,7 @@ document.addEventListener('click', function(e) {
 
   function run() {
     if (running) return; running = true; btn.disabled = true; btn.textContent = '⟳ Running...'; reset();
-    tids.push(setTimeout(function(){ document.getElementById('demoTime').textContent='14:23'; setStage('stage1','active','Active','Inbound call from +44 7700 900458 · 4 rings · unanswered'); meters('0.2',28); },400));
+    tids.push(setTimeout(function(){ document.getElementById('demoTime').textContent='14:23'; setStage('stage1','active','Active','Inbound call from +44 7700 900123 · 4 rings · unanswered'); meters('0.2',28); },400));
     tids.push(setTimeout(function(){ setStage('stage1','done','✓ Done','Call missed · routing to text-back flow'); setStage('stage2','active','Active','Generating personalised auto-reply...'); show('auto-reply'); meters('1.1',142); },1400));
     tids.push(setTimeout(function(){ setStage('stage2','done','✓ Sent','SMS delivered to caller'); meters('2.3',198); },2400));
     tids.push(setTimeout(function(){ document.getElementById('demoIncoming').style.display='block'; show('customer-reply'); setStage('stage3','active','Parsing','Analysing 18 tokens of inbound message...'); meters('3.5',220); },3500));
